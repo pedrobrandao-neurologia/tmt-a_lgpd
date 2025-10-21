@@ -22,6 +22,11 @@ CREATE TABLE consents (
     -- Versão do termo de consentimento
     consent_version VARCHAR(10) DEFAULT '1.0',
 
+    -- Dados demográficos criptografados (LGPD Art. 46)
+    encrypted_demographics TEXT,
+    demographics_iv VARCHAR(32),
+    demographics_auth_tag VARCHAR(32),
+
     -- Dados de registro
     consent_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     ip_address INET NOT NULL,

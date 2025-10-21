@@ -2203,9 +2203,13 @@
         // FUNÇÕES DE INTEGRAÇÃO COM BACKEND
         // ========================================
 
-        async function registerConsent(formData) {
+        async function registerConsent(participantData) {
             const consentPayload = {
-                participantEmail: formData.email,
+                participantEmail: participantData.email,
+                participantName: participantData.name,
+                participantAge: participantData.age,
+                participantGender: participantData.gender,
+                participantEducation: participantData.education,
                 consentTypes: ['data_collection', 'research_use', 'data_storage'],
                 consentText: 'Li e concordo com o termo de consentimento. Autorizo a coleta, armazenamento e processamento dos meus dados conforme descrito.',
                 ipAddress: null // Será capturado pelo backend
