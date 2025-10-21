@@ -1094,7 +1094,8 @@
             SOUND_ENABLED: true,
             HIGH_CONTRAST: false,
             SHOW_TRAILS: true,
-            API_BASE_URL: window.location.origin
+            API_BASE_URL: window.location.origin,
+            DEMO_MODE: false // Será ativado automaticamente se o backend não estiver disponível
         };
 
         // Dados do participante e token de consentimento
@@ -2221,7 +2222,8 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(consentPayload)
+                    body: JSON.stringify(consentPayload),
+                    signal: AbortSignal.timeout(5000) // Timeout de 5 segundos
                 });
 
                 if (!response.ok) {
@@ -2229,10 +2231,28 @@
                 }
 
                 const data = await response.json();
+                CONFIG.DEMO_MODE = false;
+                console.log('✅ Conectado ao backend - Modo PRODUÇÃO');
                 return data.consentToken;
             } catch (error) {
-                console.error('Erro ao registrar consentimento:', error);
-                throw error;
+                // Se o backend não estiver disponível, ativa modo DEMO
+                console.warn('⚠️ Backend não disponível. Ativando MODO DEMONSTRAÇÃO.');
+                console.log('📝 Para usar o backend completo, execute: npm install && npm start');
+                CONFIG.DEMO_MODE = true;
+
+                // Gera um token local simulado
+                const demoToken = 'DEMO-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
+                // Salva dados localmente
+                localStorage.setItem('tmt-consent-data', JSON.stringify({
+                    ...consentPayload,
+                    consentToken: demoToken,
+                    consentedAt: new Date().toISOString(),
+                    mode: 'DEMO'
+                }));
+
+                console.log('💾 Dados salvos localmente no navegador (MODO DEMO)');
+                return demoToken;
             }
         }
 
@@ -2261,6 +2281,21 @@
                 }
             };
 
+            // Se estiver em modo DEMO, apenas salva localmente
+            if (CONFIG.DEMO_MODE) {
+                console.log('💾 MODO DEMO: Salvando dados localmente...');
+                const demoData = JSON.parse(localStorage.getItem('tmt-demo-data') || '[]');
+                demoData.push({
+                    ...payload,
+                    savedAt: new Date().toISOString()
+                });
+                localStorage.setItem('tmt-demo-data', JSON.stringify(demoData));
+                console.log('✅ Dados salvos no LocalStorage (MODO DEMO)');
+                console.log('📊 Total de testes salvos:', demoData.length);
+                return { success: true, mode: 'DEMO', recordId: 'demo-' + Date.now() };
+            }
+
+            // Modo produção - envia para o backend
             try {
                 const response = await fetch(`${CONFIG.API_BASE_URL}/api/tmt-data`, {
                     method: 'POST',
@@ -2268,7 +2303,8 @@
                         'Content-Type': 'application/json',
                         'X-Consent-Token': consentToken
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: AbortSignal.timeout(5000)
                 });
 
                 if (!response.ok) {
@@ -2276,11 +2312,22 @@
                 }
 
                 const data = await response.json();
-                console.log('Dados enviados com sucesso:', data);
+                console.log('✅ Dados enviados ao backend com sucesso:', data);
                 return data;
             } catch (error) {
-                console.error('Erro ao enviar dados:', error);
-                // Continuar mesmo com erro - dados ainda estão salvos localmente
+                console.error('⚠️ Erro ao enviar dados ao backend:', error);
+                console.log('💾 Salvando localmente como backup...');
+
+                // Salva localmente como backup
+                const backupData = JSON.parse(localStorage.getItem('tmt-backup-data') || '[]');
+                backupData.push({
+                    ...payload,
+                    savedAt: new Date().toISOString(),
+                    error: error.message
+                });
+                localStorage.setItem('tmt-backup-data', JSON.stringify(backupData));
+                console.log('✅ Backup salvo no LocalStorage');
+
                 return null;
             }
         }
@@ -2390,6 +2437,40 @@
                 document.getElementById('testSection').classList.remove('hidden');
 
                 console.log('Consentimento registrado com sucesso. Token:', consentToken);
+
+                // Mostrar banner se estiver em modo DEMO
+                if (CONFIG.DEMO_MODE) {
+                    const demoBanner = document.createElement('div');
+                    demoBanner.style.cssText = `
+                        position: fixed;
+                        top: 10px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        z-index: 10000;
+                        font-weight: 600;
+                        animation: slideDown 0.5s ease-out;
+                    `;
+                    demoBanner.innerHTML = `
+                        <div style="text-align: center;">
+                            ⚡ MODO DEMONSTRAÇÃO ATIVADO
+                            <div style="font-size: 0.85em; margin-top: 4px; opacity: 0.9;">
+                                Dados salvos localmente no navegador
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(demoBanner);
+
+                    // Remove o banner após 5 segundos
+                    setTimeout(() => {
+                        demoBanner.style.animation = 'slideUp 0.5s ease-in';
+                        setTimeout(() => demoBanner.remove(), 500);
+                    }, 5000);
+                }
             } catch (error) {
                 alert('Erro ao registrar consentimento. Por favor, tente novamente.');
                 submitBtn.disabled = false;
