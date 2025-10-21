@@ -33,6 +33,8 @@ O sistema foi desenvolvido desde o início com foco em **privacidade e proteçã
 
 ### Frontend (Interface do Teste)
 
+- ✅ **Formulário de dados demográficos** (nome, email, idade, sexo, escolaridade)
+- ✅ **Termo de consentimento LGPD** integrado
 - ✅ Interface responsiva e acessível
 - ✅ Aquecimento antes do teste principal
 - ✅ 25 números com posicionamento aleatório
@@ -41,6 +43,7 @@ O sistema foi desenvolvido desde o início com foco em **privacidade e proteçã
 - ✅ Métricas detalhadas de desempenho
 - ✅ Comparação com dados normativos
 - ✅ Exportação de resultados (CSV, JSON)
+- ✅ **Envio automático de resultados para o backend**
 
 ### Backend LGPD-Compliant
 
@@ -131,21 +134,27 @@ tmt-a_lgpd/
 ```
 1. Participante acessa o teste
    ↓
-2. Consentimento LGPD apresentado
+2. Formulário de dados demográficos apresentado
    ↓
-3. Aceite registrado com timestamp e IP
+3. Termo de consentimento LGPD apresentado
    ↓
-4. Token de consentimento gerado
+4. Aceite registrado com timestamp e IP
    ↓
-5. Teste realizado
+5. Token de consentimento gerado via API (/api/consent)
    ↓
-6. Dados criptografados com AES-256-GCM
+6. Interface do teste é liberada
    ↓
-7. ID pseudonimizado (hash irreversível)
+7. Teste realizado (aquecimento + teste principal)
    ↓
-8. Armazenamento seguro no PostgreSQL
+8. Resultados enviados automaticamente ao backend (/api/tmt-data)
    ↓
-9. Log de auditoria registrado
+9. Dados criptografados com AES-256-GCM
+   ↓
+10. ID pseudonimizado (hash irreversível)
+   ↓
+11. Armazenamento seguro no PostgreSQL
+   ↓
+12. Log de auditoria registrado
 ```
 
 ### Camadas de Proteção

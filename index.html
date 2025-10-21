@@ -644,6 +644,129 @@
                 display: none !important;
             }
         }
+
+        /* Estilos para formulário de dados demográficos */
+        .demographics-form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            transition: all var(--transition-speed);
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--error-color);
+        }
+
+        .form-error {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .consent-box {
+            background: #f9f9f9;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            line-height: 1.6;
+        }
+
+        .consent-box h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        }
+
+        .consent-box p {
+            margin-bottom: 0.75rem;
+        }
+
+        .consent-box ul {
+            margin-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-top: 0.25rem;
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .required-mark {
+            color: var(--error-color);
+            margin-left: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -653,7 +776,113 @@
             <p>Avaliação da Atenção e Velocidade de Processamento</p>
         </header>
 
-        <main class="main-content">
+        <!-- Formulário de Dados Demográficos e Consentimento -->
+        <div class="main-content demographics-form" id="demographicsSection">
+            <h3 style="text-align: center; color: var(--primary-color); margin-bottom: 1.5rem;">
+                Dados do Participante
+            </h3>
+
+            <form id="demographicsForm">
+                <div class="form-group">
+                    <label for="participantName">
+                        Nome Completo<span class="required-mark">*</span>
+                    </label>
+                    <input type="text" id="participantName" name="participantName" required>
+                    <div class="form-error" id="nameError">Por favor, informe seu nome completo</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="participantEmail">
+                        E-mail<span class="required-mark">*</span>
+                    </label>
+                    <input type="email" id="participantEmail" name="participantEmail" required>
+                    <div class="form-error" id="emailError">Por favor, informe um e-mail válido</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="participantAge">
+                        Idade<span class="required-mark">*</span>
+                    </label>
+                    <input type="number" id="participantAge" name="participantAge" min="18" max="120" required>
+                    <div class="form-error" id="ageError">Por favor, informe sua idade (mínimo 18 anos)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="participantGender">
+                        Sexo<span class="required-mark">*</span>
+                    </label>
+                    <select id="participantGender" name="participantGender" required>
+                        <option value="">Selecione...</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="feminino">Feminino</option>
+                        <option value="outro">Outro</option>
+                        <option value="prefiro-nao-informar">Prefiro não informar</option>
+                    </select>
+                    <div class="form-error" id="genderError">Por favor, selecione uma opção</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="participantEducation">
+                        Escolaridade<span class="required-mark">*</span>
+                    </label>
+                    <select id="participantEducation" name="participantEducation" required>
+                        <option value="">Selecione...</option>
+                        <option value="fundamental-incompleto">Ensino Fundamental Incompleto</option>
+                        <option value="fundamental-completo">Ensino Fundamental Completo</option>
+                        <option value="medio-incompleto">Ensino Médio Incompleto</option>
+                        <option value="medio-completo">Ensino Médio Completo</option>
+                        <option value="superior-incompleto">Ensino Superior Incompleto</option>
+                        <option value="superior-completo">Ensino Superior Completo</option>
+                        <option value="pos-graduacao">Pós-graduação</option>
+                    </select>
+                    <div class="form-error" id="educationError">Por favor, selecione sua escolaridade</div>
+                </div>
+
+                <!-- Termo de Consentimento -->
+                <div class="consent-box">
+                    <h4>📋 Termo de Consentimento - LGPD</h4>
+                    <p><strong>Finalidade da coleta de dados:</strong></p>
+                    <p>Os dados coletados serão utilizados exclusivamente para fins de pesquisa científica em avaliação neuropsicológica.</p>
+
+                    <p><strong>Dados coletados:</strong></p>
+                    <ul>
+                        <li>Dados demográficos (nome, e-mail, idade, sexo, escolaridade)</li>
+                        <li>Resultados do teste TMT-A (tempos de reação, erros, métricas de desempenho)</li>
+                        <li>Metadados técnicos (navegador, resolução de tela, timestamp)</li>
+                    </ul>
+
+                    <p><strong>Seus direitos (LGPD - Lei 13.709/2018):</strong></p>
+                    <ul>
+                        <li>Acesso aos seus dados a qualquer momento</li>
+                        <li>Correção de dados incompletos ou incorretos</li>
+                        <li>Revogação do consentimento e eliminação dos dados</li>
+                        <li>Portabilidade dos dados para outro fornecedor</li>
+                    </ul>
+
+                    <p><strong>Segurança:</strong></p>
+                    <p>Seus dados serão pseudonimizados e criptografados, garantindo máxima proteção e privacidade.</p>
+
+                    <p><strong>Retenção:</strong></p>
+                    <p>Os dados serão mantidos por 2 anos, podendo ser excluídos a qualquer momento mediante solicitação.</p>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="consentCheckbox" name="consent" required>
+                    <label for="consentCheckbox">
+                        Li e concordo com o termo de consentimento acima. Autorizo a coleta, armazenamento e processamento dos meus dados conforme descrito, estando ciente dos meus direitos.<span class="required-mark">*</span>
+                    </label>
+                </div>
+                <div class="form-error" id="consentError" style="text-align: center;">Você precisa consentir para continuar</div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" id="submitDemographics">
+                        Prosseguir para o Teste
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <main class="main-content hidden" id="testSection">
             <div class="phase-indicator">
                 <div class="phase-dot" id="phase-1">1</div>
                 <div class="phase-dot" id="phase-2">2</div>
@@ -864,8 +1093,13 @@
             MAX_TIME: 300000,
             SOUND_ENABLED: true,
             HIGH_CONTRAST: false,
-            SHOW_TRAILS: true
+            SHOW_TRAILS: true,
+            API_BASE_URL: window.location.origin
         };
+
+        // Dados do participante e token de consentimento
+        let participantData = null;
+        let consentToken = null;
 
         const NORMATIVE_DATA = {
             '18-24': { mean: 22.93, sd: 6.87 },
@@ -1387,12 +1621,12 @@
                 }
             }
 
-            completeTest() {
+            async completeTest() {
                 this.stopTimer();
                 this.state.endTime = Date.now();
                 this.state.phase = 'completed';
                 this.container.classList.remove('test-in-progress');
-                
+
                 if (this.state.isPractice) {
                     this.showMessage('Aquecimento concluído! Pronto para o teste?', 'success');
                     this.startBtn.disabled = false;
@@ -1400,21 +1634,38 @@
                 } else {
                     this.updatePhase(4);
                     this.calculateResults();
-                    this.showMessage('Teste concluído!', 'success');
+
+                    // Enviar dados para o backend
+                    try {
+                        await sendTestDataToBackend(this.results, 'test');
+                        this.showMessage('Teste concluído e dados salvos!', 'success');
+                    } catch (error) {
+                        console.error('Erro ao enviar dados:', error);
+                        this.showMessage('Teste concluído! (dados salvos localmente)', 'success');
+                    }
+
                     this.pauseBtn.style.display = 'none';
                     this.resultsBtn.style.display = 'inline-block';
                     this.showResults();
                 }
-                
+
                 this.playSound('complete');
             }
 
-            timeout() {
+            async timeout() {
                 this.stopTimer();
                 this.state.endTime = Date.now();
                 this.container.classList.remove('test-in-progress');
-                this.showMessage('Tempo esgotado!', 'error');
                 this.calculateResults();
+
+                // Enviar dados para o backend mesmo com timeout
+                try {
+                    await sendTestDataToBackend(this.results, 'test');
+                } catch (error) {
+                    console.error('Erro ao enviar dados:', error);
+                }
+
+                this.showMessage('Tempo esgotado!', 'error');
                 this.showResults();
             }
 
@@ -1948,11 +2199,211 @@
             }
         };
 
+        // ========================================
+        // FUNÇÕES DE INTEGRAÇÃO COM BACKEND
+        // ========================================
+
+        async function registerConsent(formData) {
+            const consentPayload = {
+                participantEmail: formData.email,
+                consentTypes: ['data_collection', 'research_use', 'data_storage'],
+                consentText: 'Li e concordo com o termo de consentimento. Autorizo a coleta, armazenamento e processamento dos meus dados conforme descrito.',
+                ipAddress: null // Será capturado pelo backend
+            };
+
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/consent`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(consentPayload)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao registrar consentimento');
+                }
+
+                const data = await response.json();
+                return data.consentToken;
+            } catch (error) {
+                console.error('Erro ao registrar consentimento:', error);
+                throw error;
+            }
+        }
+
+        async function sendTestDataToBackend(testData, phase) {
+            if (!consentToken) {
+                console.error('Sem token de consentimento');
+                return;
+            }
+
+            const payload = {
+                sessionId: `session-${Date.now()}`,
+                testPhase: phase,
+                data: {
+                    participantInfo: participantData,
+                    testResults: testData,
+                    timestamp: new Date().toISOString()
+                },
+                results: testData,
+                metadata: {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    screenWidth: window.screen.width,
+                    screenHeight: window.screen.height,
+                    canvasWidth: document.getElementById('testCanvas')?.getBoundingClientRect().width,
+                    canvasHeight: document.getElementById('testCanvas')?.getBoundingClientRect().height
+                }
+            };
+
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/tmt-data`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Consent-Token': consentToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao enviar dados para o servidor');
+                }
+
+                const data = await response.json();
+                console.log('Dados enviados com sucesso:', data);
+                return data;
+            } catch (error) {
+                console.error('Erro ao enviar dados:', error);
+                // Continuar mesmo com erro - dados ainda estão salvos localmente
+                return null;
+            }
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showFormError(fieldId, show = true) {
+            const errorElement = document.getElementById(fieldId + 'Error');
+            const inputElement = document.getElementById(fieldId);
+
+            if (errorElement) {
+                errorElement.style.display = show ? 'block' : 'none';
+            }
+
+            if (inputElement) {
+                if (show) {
+                    inputElement.classList.add('error');
+                } else {
+                    inputElement.classList.remove('error');
+                }
+            }
+        }
+
+        async function handleDemographicsSubmit(event) {
+            event.preventDefault();
+
+            // Validação do formulário
+            let isValid = true;
+
+            const name = document.getElementById('participantName').value.trim();
+            if (name.length < 3) {
+                showFormError('participantName', true);
+                isValid = false;
+            } else {
+                showFormError('participantName', false);
+            }
+
+            const email = document.getElementById('participantEmail').value.trim();
+            if (!validateEmail(email)) {
+                showFormError('participantEmail', true);
+                isValid = false;
+            } else {
+                showFormError('participantEmail', false);
+            }
+
+            const age = parseInt(document.getElementById('participantAge').value);
+            if (isNaN(age) || age < 18 || age > 120) {
+                showFormError('participantAge', true);
+                isValid = false;
+            } else {
+                showFormError('participantAge', false);
+            }
+
+            const gender = document.getElementById('participantGender').value;
+            if (!gender) {
+                showFormError('participantGender', true);
+                isValid = false;
+            } else {
+                showFormError('participantGender', false);
+            }
+
+            const education = document.getElementById('participantEducation').value;
+            if (!education) {
+                showFormError('participantEducation', true);
+                isValid = false;
+            } else {
+                showFormError('participantEducation', false);
+            }
+
+            const consent = document.getElementById('consentCheckbox').checked;
+            if (!consent) {
+                showFormError('consent', true);
+                isValid = false;
+            } else {
+                showFormError('consent', false);
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            // Coletar dados do formulário
+            participantData = {
+                name: name,
+                email: email,
+                age: age,
+                gender: gender,
+                education: education,
+                consentedAt: new Date().toISOString()
+            };
+
+            // Mostrar loading no botão
+            const submitBtn = document.getElementById('submitDemographics');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Registrando...';
+
+            try {
+                // Registrar consentimento na API
+                consentToken = await registerConsent(participantData);
+
+                // Sucesso - mostrar seção do teste
+                document.getElementById('demographicsSection').classList.add('hidden');
+                document.getElementById('testSection').classList.remove('hidden');
+
+                console.log('Consentimento registrado com sucesso. Token:', consentToken);
+            } catch (error) {
+                alert('Erro ao registrar consentimento. Por favor, tente novamente.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Configurar handler do formulário
+            const demographicsForm = document.getElementById('demographicsForm');
+            if (demographicsForm) {
+                demographicsForm.addEventListener('submit', handleDemographicsSubmit);
+            }
+
             const tmt = new TMTTest();
             window.tmtInstance = tmt;
-            
-            console.log('%cTMT-A v4.0 - Métricas Aprimoradas', 'color: #2196F3; font-size: 14px; font-weight: bold;');
+
+            console.log('%cTMT-A v4.0 - Métricas Aprimoradas + LGPD', 'color: #2196F3; font-size: 14px; font-weight: bold;');
             console.log('%cUse TMTUtils.analyzeAllSessions() para análise de histórico', 'color: #666; font-size: 12px;');
             console.log('%cUse TMTUtils.getStatistics() para estatísticas detalhadas', 'color: #666; font-size: 12px;');
         });
