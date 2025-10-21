@@ -268,6 +268,10 @@ app.get('/api/health', async (req, res) => {
 // Registrar consentimento (LGPD Art. 8)
 app.post('/api/consent', [
     body('participantEmail').isEmail().normalizeEmail(),
+    body('participantName').isString().isLength({ min: 3 }),
+    body('participantAge').isInt({ min: 18, max: 120 }),
+    body('participantGender').isString().notEmpty(),
+    body('participantEducation').isString().notEmpty(),
     body('consentTypes').isArray().notEmpty(),
     body('consentText').isString().isLength({ min: 10 }),
     body('ipAddress').optional().isIP(),
@@ -278,7 +282,7 @@ app.post('/api/consent', [
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { participantEmail, consentTypes, consentText, ipAddress } = req.body;
+    const { participantEmail, participantName, participantAge, participantGender, participantEducation, consentTypes, consentText, ipAddress } = req.body;
 
     try {
         // Gerar token de consentimento único
@@ -291,11 +295,22 @@ app.post('/api/consent', [
         const expiresAt = new Date();
         expiresAt.setFullYear(expiresAt.getFullYear() + 2);
 
+        // Criptografar dados demográficos (dados sensíveis)
+        const demographicsData = {
+            name: participantName,
+            email: participantEmail,
+            age: participantAge,
+            gender: participantGender,
+            education: participantEducation
+        };
+        const encryptedDemographics = encryptSensitiveData(demographicsData);
+
         // Salvar no banco de dados
         await pool.query(
             `INSERT INTO consents
-            (consent_token, pseudo_id, consent_types, consent_text, ip_address, user_agent, expires_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            (consent_token, pseudo_id, consent_types, consent_text, ip_address, user_agent, expires_at,
+             encrypted_demographics, demographics_iv, demographics_auth_tag)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
             [
                 consentToken,
                 pseudoId,
@@ -303,7 +318,10 @@ app.post('/api/consent', [
                 consentText,
                 clientIp,
                 userAgent,
-                expiresAt
+                expiresAt,
+                encryptedDemographics.encrypted,
+                encryptedDemographics.iv,
+                encryptedDemographics.authTag
             ]
         );
 
